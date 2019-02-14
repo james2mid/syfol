@@ -1,5 +1,5 @@
 import Debug from 'debug'
-const debug = Debug('syfol:index')
+const debug = Debug('syfol:main')
 import { getEnv } from './env'
 import { users, getActiveFollowCount, patchUnfollow, getExpiredIds, insertFollow } from './db'
 import { follow, getUserIdsFromSearch } from './twitter'
