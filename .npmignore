@@ -4,3 +4,5 @@ src
 .env
 db.json
 ecosystem.json
+.vscode
+.tsconfig.json

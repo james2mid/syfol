@@ -1,6 +1,6 @@
 {
   "name": "syfol",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Follow twitter users temporarily to gain followers.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
