@@ -4,7 +4,13 @@ import { getEnv } from './env'
 import { users } from './db'
 import { follow, getUserIdsFromSearch } from './twitter'
 
+let timerId: NodeJS.Timeout | null
+
 export function setup () {
+  if (timerId) {
+    throw new Error('Setup has already been called.')
+  }
+
   const { BATCH_INTERVAL } = getEnv()
 
   // call first tick
@@ -12,7 +18,14 @@ export function setup () {
 
   // schedule later ticks
   const interval = Number(BATCH_INTERVAL)
-  setInterval(tick, interval)
+  timerId = setInterval(tick, interval)
+}
+
+export function cancel () {
+  if (!timerId) return
+  
+  clearInterval(timerId)
+  timerId = null
 }
 
 async function tick () {
@@ -102,7 +115,6 @@ async function processFollowing () {
     debug(`Removed ${diff} users to match follower limit of ${FOLLOWER_LIMIT}`)
   }
   
-  debug(`Currently following ${users.toLength().value()} `)
   debug(`Attempting to follow ${userIds.length} users`)
   
   // attempt to follow each
