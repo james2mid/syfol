@@ -4,8 +4,8 @@
  * Sorts into ascending order when used with `Array#sort()`. */
 export function compareNumbers (first: string, second: string): -1 | 0 | 1 {
   // firstly check if they can both be evaluated natively as numbers
-  const firstNumber = Number(first)//?
-  const secondNumber = Number(second)//?
+  const firstNumber = Number(first)
+  const secondNumber = Number(second)
 
   // perform native evaluation if possible
   if (Math.abs(firstNumber) < Number.MAX_SAFE_INTEGER && Math.abs(secondNumber) < Number.MAX_SAFE_INTEGER) {
