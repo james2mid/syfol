@@ -1,0 +1,46 @@
+{
+  "name": "syfol",
+  "version": "1.0.0",
+  "description": "Follow twitter users temporarily to gain followers.",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/james2mid/syfol.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/james2mid/syfol/issues"
+  },
+  "homepage": "https://github.com/james2mid/syfol#readme",
+  "devDependencies": {
+    "eslint-plugin-typescript": "^0.14.0",
+    "jest": "^23.6.0",
+    "standard": "^12.0.1",
+    "ts-jest": "^23.10.5",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.3.3",
+    "typescript-eslint-parser": "^22.0.0"
+  },
+  "standard": {
+    "parser": "typescript-eslint-parser",
+    "plugins": [
+      "typescript"
+    ]
+  },
+  "dependencies": {
+    "@types/debug": "^4.1.0",
+    "@types/joi": "^14.3.1",
+    "@types/lowdb": "^1.0.6",
+    "@types/twitter": "^1.7.0",
+    "debug": "^4.1.1",
+    "jimlim": "^1.2.0",
+    "joi": "^14.3.1",
+    "lowdb": "^1.0.0",
+    "twitter": "^1.7.1"
+  }
+}
