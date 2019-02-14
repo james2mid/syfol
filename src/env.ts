@@ -3,6 +3,7 @@ const debug = Debug('syfol:env')
 import * as joi from 'joi'
 const dotenv = require('dotenv')
 
+/** The schema for `process.env`. Only contains keys used in the program. */
 interface Env {
   SEARCH_QUERY: string,
   BATCH_INTERVAL: string,
@@ -17,9 +18,12 @@ interface Env {
   TWITTER_ACCESS_TOKEN_SECRET: string
 }
 
-let envPath = process.env.ENV_PATH || process.env.HOME + '/.syfol'
+/** The path to the env file. File must be created unless environment variables are set at runtime. */
+let envPath = process.env.ENV_PATH || (process.env.HOME + '/.syfol')
+/** Indicated whether the environment variables have been loaded and validated. */
 let processedEnv: boolean = false
 
+/** Used externally to set the env path. Alternatively, set `process.env.ENV_PATH`. */
 export function changeEnvPath (path: string) {
   if (processedEnv) {
     throw new Error('The env file has already been read')
@@ -28,8 +32,7 @@ export function changeEnvPath (path: string) {
   envPath = path
 }
 
-/** A simple getter for `process.env` as a typed object for TS. */
-
+/** Gets a typed `process.env`. Loads from the env path and validates on first call. */
 export function getEnv (): Env {
   if (!processedEnv) {
     debug(`Loading environment variables from '${envPath}'`)
@@ -45,7 +48,7 @@ export function getEnv (): Env {
   return process.env as any
 }
 
-/** Tests `process.env` to ensure all necessary variables have been set. */
+/** Tests `process.env` to ensure all necessary properties have been set. */
 function validateEnv () {
   debug('Checking environment variables')
 
