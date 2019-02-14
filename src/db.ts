@@ -26,7 +26,7 @@ export const users: low.LoDashExplicitSyncWrapper<User[]> = db.get('users')
 
 /** Gets the number of active follows created by syfol. */
 export function getActiveFollowCount () {
-  return users.find({ following: true }).toLength().value()
+  return users.filter({ following: true }).value().length
 }
 
 /** Inserts a new record for the given id saying they've been followed. */
