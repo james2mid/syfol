@@ -83,6 +83,12 @@ export async function getUserIdsFromSearch (query: string, quantity: number): Pr
     }
   }
 
+  if (userIds.length > quantity) {
+    const diff = userIds.length - quantity
+    userIds.splice(-diff, diff)
+    debug(`Removed ${diff} users from list to not exceed requested quantity`)
+  }
+
   debug(`Finished forming a list of ${userIds.length} users`)
 
   return userIds
