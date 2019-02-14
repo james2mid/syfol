@@ -91,7 +91,7 @@ async function processFollowing () {
   const followsRemaining = Number(FOLLOWER_LIMIT) - countBefore
 
   debug(`Currently following ${countBefore} users`)
-  debug(`Able to follow ${followsRemaining} more before limit of ${followsRemaining}`)
+  debug(`Able to follow ${followsRemaining} more before limit of ${FOLLOWER_LIMIT}`)
 
   if (followsRemaining <= 0) {
     debug('Follower limit has been reached, ending follow process')
@@ -99,7 +99,7 @@ async function processFollowing () {
   } else if (userIds.length > followsRemaining) {
     const diff = userIds.length - followsRemaining
     userIds.splice(-diff, diff)
-    debug(`Removed ${diff} users to meet limit`)
+    debug(`Removed ${diff} users to match limit`)
   }
   
   debug(`Attempting to follow ${userIds.length} users`)
@@ -118,8 +118,8 @@ async function processFollowing () {
     // insert new record into db
     insertFollow(id)
   }
-  const countAfter = users.find({ following: true }).toLength().value()
-  debug(`Finished. Followed ${countBefore - countAfter} users`)
+  const countAfter = getActiveFollowCount()
+  debug(`Finished. Followed ${countAfter - countBefore} users`)
 }
 
 /** Gets a list of user ids to follow. */
