@@ -1,0 +1,20 @@
+{
+  "apps": [{
+    "name" : "syfol",
+    "script" : "dist/script.js",
+    "env_production": {
+      "DEBUG": "*"
+    }
+  }],
+  "deploy" : {
+    "production" : {
+      "user" : "root",
+      "host" : ["vps.jamesmiddleton.me"],
+      "ref"  : "origin/master",
+      "repo" : "https://github.com/james2mid/syfol.git",
+      "path" : "/var/production/syfol",
+      "pre-setup" : "apt-get install -y git",
+      "post-deploy" : "npm install -y && pm2 startOrRestart --env production"
+    }
+  }
+}
