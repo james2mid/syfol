@@ -5,4 +5,4 @@ src
 db.json
 ecosystem.json
 .vscode
-.tsconfig.json
+tsconfig.json
