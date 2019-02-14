@@ -35,6 +35,7 @@ async function tick () {
   try { await processFollowing() } catch { }
 
   debug('This tick iteration has finished')
+  debug(`Next tick at ${new Date(Date.now() + Number(process.env.BATCH_INTERVAL))}`)
 }
 
 async function processUnfollowing () {
