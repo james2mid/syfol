@@ -8,7 +8,8 @@
     "start": "npm run build && node dist/script.js",
     "build": "tsc",
     "test": "standard",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepublishOnly": "npm run test && npm run build",
+    "deploy": "pm2 deploy production"
   },
   "repository": {
     "type": "git",
