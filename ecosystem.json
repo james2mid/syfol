@@ -14,7 +14,7 @@
       "repo" : "https://github.com/james2mid/syfol.git",
       "path" : "/var/production/syfol",
       "pre-setup" : "apt-get install -y git",
-      "post-deploy" : "npm install -y && npm run build && pm2 startOrRestart --env production"
+      "post-deploy" : "npm install -y && npm run build && pm2 startOrRestart ecosystem.json --env production"
     }
   }
 }
