@@ -5,7 +5,11 @@ import { getEnv } from './env';
 const adapter = new FileSync('db.json')
 
 const db = low(adapter)
-  .defaults({ users: [] })
+
+if (!db.has('users')) {
+  db.set('users', [])
+    .write()
+}
 
 /** The schema for user objects in the lowdb database. */
 interface User {
