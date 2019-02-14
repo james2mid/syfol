@@ -4,19 +4,21 @@ import { getEnv } from './env';
 
 const adapter = new FileSync('db.json')
 
-const db = low(adapter)
-
-if (!db.has('users')) {
-  db.set('users', [])
-    .write()
-}
+const db = (() => {
+  const db = low(adapter)
+  if (!db.has('users').value()) {
+    db.set('users', [])
+      .write()
+  }
+  return db
+})()
 
 /** The schema for user objects in the lowdb database. */
 interface User {
   id: string
   following: boolean
-  followTime: Date
-  unfollowTime?: Date
+  followTime: string | Date
+  unfollowTime?: string | Date
 }
 
 /** The typed lowdb collection for users. */
@@ -45,10 +47,12 @@ export function patchUnfollow (id: string) {
 /** Gets a list of ids whose follow has expired and should be unfollowed. */
 export function getExpiredIds () {
   const { FOLLOW_PERIOD } = getEnv()
+  // follows created before this time have expired
   const expiryTime = Date.now() - Number(FOLLOW_PERIOD)
 
   return users
-    .filter(x => x.followTime.getTime() < expiryTime && x.following)
+    .filter({ following: true })
+    .filter(x => new Date(x.followTime).getTime() < expiryTime)
     .map(x => x.id)
     .value()
 }
