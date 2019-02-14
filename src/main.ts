@@ -1,11 +1,12 @@
 import Debug from 'debug'
 const debug = Debug('syfol:index')
 import { getEnv } from './env'
-import { users } from './db'
+import { users, getActiveFollowCount, patchUnfollow, getExpiredIds, insertFollow } from './db'
 import { follow, getUserIdsFromSearch } from './twitter'
 
 let timerId: NodeJS.Timeout | null
 
+/** Used externally to start the worker. */
 export function setup () {
   if (timerId) {
     throw new Error('Setup has already been called.')
@@ -14,13 +15,14 @@ export function setup () {
   const { BATCH_INTERVAL } = getEnv()
 
   // call first tick
-  tick()
+  work()
 
   // schedule later ticks
   const interval = Number(BATCH_INTERVAL)
-  timerId = setInterval(tick, interval)
+  timerId = setInterval(work, interval)
 }
 
+/** Used externally to stop the worker. */
 export function cancel () {
   if (!timerId) return
   
@@ -28,28 +30,22 @@ export function cancel () {
   timerId = null
 }
 
-async function tick () {
-  debug('Tick has been called')
+/** A single iteration of work by calling other processor functions. */
+async function work () {
+  debug('Starting work')
 
   try { await processUnfollowing() } catch { }
   try { await processFollowing() } catch { }
 
-  debug('This tick iteration has finished')
-  debug(`Next tick at ${new Date(Date.now() + Number(process.env.BATCH_INTERVAL))}`)
+  debug('This work has finished')
+  debug(`Next working at ${new Date(Date.now() + Number(process.env.BATCH_INTERVAL))}`)
 }
 
+/** Attempts to unfollow all expired follows. */
 async function processUnfollowing () {
-  const { FOLLOW_PERIOD } = getEnv()
-
   debug('--- Starting to unfollow users ---')
-
-  const expiryTime = Date.now() - Number(FOLLOW_PERIOD)
-  const unfollowList: string[] =
-    users
-      .filter(x => x.followTime.getTime() < expiryTime && x.following)
-      .map(x => x.id)
-      .value()
   
+  const unfollowList: string[] = getExpiredIds()
   if (!unfollowList.length) {
     debug('No users to unfollow, moving on...')
     return
@@ -57,30 +53,74 @@ async function processUnfollowing () {
 
   debug(`Planning to unfollow ${unfollowList.length} users`)
 
+  const countBefore = getActiveFollowCount()
   for (let id of unfollowList) {
-    // try to unfollow
+    // attempt unfollow at Twitter API
     try {
       await follow(id, true)
-
-      users
-        .find({ id })
-        .assign({ following: false, unfollowTime: new Date() })
-        .write()
     } catch (err) {
       debug(`Error occured while unfollowing user, breaking`)
       debug(err)
       break
     }
+
+    // mark in db that user has been unfollowed
+    patchUnfollow(id)
   }
+  const countAfter = getActiveFollowCount()
+  debug(`Finished. Unfollowed ${countBefore - countAfter} users`)
 }
 
+/** Attempts to follow new users from search. */
 async function processFollowing () {
   debug('--- Starting to follow users ---')
 
-  const { SEARCH_QUERY, EXCLUDE_USERS, BATCH_QUANTITY, FOLLOWER_LIMIT } = getEnv()
+  const { FOLLOWER_LIMIT } = getEnv()
+  
+  const userIds = await getIdsToFollow()
+
+  const countBefore = getActiveFollowCount()
+  const followsRemaining = Number(FOLLOWER_LIMIT) - countBefore
+
+  debug(`Currently following ${countBefore} users`)
+  debug(`Able to follow ${followsRemaining} more before limit of ${followsRemaining}`)
+
+  if (followsRemaining <= 0) {
+    debug('Follower limit has been reached, ending follow process')
+    return
+  } else if (userIds.length > followsRemaining) {
+    const diff = userIds.length - followsRemaining
+    userIds.splice(-diff, diff)
+    debug(`Removed ${diff} users to meet limit`)
+  }
+  
+  debug(`Attempting to follow ${userIds.length} users`)
+  
+  // attempt following each new user
+  for (let id of userIds) {
+    try {
+      await follow(id)
+    } catch (err) {
+      console.log('caught')
+      debug(`Error occured while following user, breaking`)
+      debug(err)
+      break
+    }
+
+    // insert new record into db
+    insertFollow(id)
+  }
+  const countAfter = users.find({ following: true }).toLength().value()
+  debug(`Finished. Followed ${countBefore - countAfter} users`)
+}
+
+/** Gets a list of user ids to follow. */
+async function getIdsToFollow () {
+  const { SEARCH_QUERY, EXCLUDE_USERS, BATCH_QUANTITY } = getEnv()
+
   const excludedIds = EXCLUDE_USERS.split(',')
 
-  const userIds = (await getUserIdsFromSearch(SEARCH_QUERY, Number(BATCH_QUANTITY)))
+  return (await getUserIdsFromSearch(SEARCH_QUERY, Number(BATCH_QUANTITY)))
     .filter(id => {
       // check whether the id is excluded
       if (excludedIds.includes(id)) {
@@ -97,41 +137,4 @@ async function processFollowing () {
 
       return true
     })
-  
-  const activeCount = users
-    .filter({ following: true })
-    .toLength()
-    .value()
-  const followsRemaining = Number(FOLLOWER_LIMIT) - activeCount
-
-  debug(`Currently following ${activeCount} users`)
-  debug(`Able to follow ${followsRemaining} more users before reaching limit of ${followsRemaining}`)
-
-  if (followsRemaining <= 0) {
-    debug('Follower limit has been reached, ending follow process')
-    return
-  } else if (userIds.length > followsRemaining) {
-    const diff = userIds.length - followsRemaining
-    userIds.splice(-diff, diff)
-    debug(`Removed ${diff} users to match follower limit of ${FOLLOWER_LIMIT}`)
-  }
-  
-  debug(`Attempting to follow ${userIds.length} users`)
-  
-  // attempt to follow each
-  for (let id of userIds) {
-    try {
-      await follow(id)
-
-      users
-        .push({ id, following: true, followTime: new Date() })
-        .write()
-    } catch (err) {
-      console.log('caught')
-      debug(`Error occured while following user, breaking`)
-      debug(err)
-      break
-    }
-  }
-
 }

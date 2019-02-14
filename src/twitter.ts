@@ -3,10 +3,9 @@ const debug = Debug('syfol:twitter')
 import Twitter from 'twitter'
 const Limiter = require('jimlim')
 import { getEnv } from './env'
-import { compareNumbers } from './misc';
+import { compareNumbers } from './misc'
 
 const client = getClient()
-
 function getClient () {
   const env = getEnv()
 
@@ -20,7 +19,7 @@ function getClient () {
   })
 }
 
-/** Gets an array of usernames by searching for the specified query. */
+/** Gets an array of unique user ids by searching for the specified query. */
 export async function getUserIdsFromSearch (query: string, quantity: number): Promise<string[]> {
   debug(`Searching Twitter for ${query}`)
 
@@ -89,7 +88,7 @@ export async function getUserIdsFromSearch (query: string, quantity: number): Pr
   return userIds
 }
 
-/** Follows or unfollows the provided user. Rejects on an error or when rate limit reached. */
+/** Follows or unfollows the provided user. Rejects on an error or when rate limit has been reached. */
 export async function follow (user_id: string, unfollow: boolean = false) {
   debug(`${unfollow ? 'Unfollowing' : 'Following'} user ${user_id}`)
 
@@ -99,7 +98,7 @@ export async function follow (user_id: string, unfollow: boolean = false) {
     const limiter = new Limiter(200, 4 * 60 * 60 * 1000, 'twitter:follow')
     promise = limiter.execute(() => client.post('friendships/create.json', {
       user_id,
-      follow: false
+      follow: false // this option is for notifications
     }))
   } else {
     const limiter = new Limiter(100, 4 * 60 * 60 * 1000, 'twitter:unfollow')
