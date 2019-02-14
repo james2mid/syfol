@@ -15,9 +15,9 @@
     "type": "git",
     "url": "git+https://github.com/james2mid/syfol.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["twitter", "bot", "follow", "followers", "script"],
+  "author": "James Middleton",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/james2mid/syfol/issues"
   },
