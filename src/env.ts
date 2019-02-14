@@ -60,7 +60,7 @@ function validateEnv () {
   def('EXCLUDE_USERS', '12')
   def('FOLLOWER_LIMIT', 1000)
 
-  joi.assert(process.env, joi.object({
+  const schema: { [k in keyof Env]: joi.Schema } = {
     SEARCH_QUERY: joi.string().min(1),
     BATCH_INTERVAL: joi.string().regex(/^\d+$/),
     BATCH_QUANTITY: joi.string().regex(/^\d+$/),
@@ -72,7 +72,9 @@ function validateEnv () {
     TWITTER_CONSUMER_SECRET: joi.string().min(45).max(60),
     TWITTER_ACCESS_TOKEN_KEY: joi.string().min(45).max(60),
     TWITTER_ACCESS_TOKEN_SECRET: joi.string().min(40).max(55)
-  }).unknown(true))
+  }
+
+  joi.assert(process.env, joi.object(schema).unknown(true))
 
   // TODO test twitter keys
 
