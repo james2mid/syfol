@@ -5,8 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "start": "npm run build && node dist/script.js",
     "build": "tsc",
-    "test": "standard"
+    "test": "standard",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "repository": {
     "type": "git",
@@ -40,6 +42,7 @@
     "@types/lowdb": "^1.0.6",
     "@types/twitter": "^1.7.0",
     "debug": "^4.1.1",
+    "dotenv": "^6.2.0",
     "jimlim": "^1.2.0",
     "joi": "^14.3.1",
     "lowdb": "^1.0.0",
