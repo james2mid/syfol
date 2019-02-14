@@ -34,8 +34,16 @@ export function cancel () {
 async function work () {
   debug('Starting work')
 
-  try { await processUnfollowing() } catch { }
-  try { await processFollowing() } catch { }
+  await processUnfollowing()
+    .catch(err => {
+      debug('Error occured in the unfollowing process')
+      debug(err)
+    })
+  await processFollowing()
+    .catch(err => {
+      debug('Error occured in the following process')
+      debug(err)
+    })
 
   debug('This work has finished')
   debug(`Next working at ${new Date(Date.now() + Number(process.env.BATCH_INTERVAL))}`)
