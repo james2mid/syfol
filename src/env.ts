@@ -1,6 +1,7 @@
 import Debug from 'debug'
 const debug = Debug('syfol:env')
 import * as joi from 'joi'
+const dotenv = require('dotenv')
 
 interface Env {
   SEARCH_QUERY: string,
@@ -16,12 +17,29 @@ interface Env {
   TWITTER_ACCESS_TOKEN_SECRET: string
 }
 
+let envPath = process.env.ENV_PATH || process.env.HOME + '/.syfol'
+let processedEnv: boolean = false
+
+export function changeEnvPath (path: string) {
+  if (processedEnv) {
+    throw new Error('The env file has already been read')
+  }
+
+  envPath = path
+}
+
 /** A simple getter for `process.env` as a typed object for TS. */
-let checkedEnv: boolean = false
+
 export function getEnv (): Env {
-  if (!checkedEnv) {
+  if (!processedEnv) {
+    debug(`Loading environment variables from '${envPath}'`)
+    const result = dotenv.config({ path: envPath })
+    result.error ?
+      debug('Failed to load from file') :
+      debug('Loaded successfully from file')
+      
     validateEnv()
-    checkedEnv = true
+    processedEnv = true
   }
 
   return process.env as any
