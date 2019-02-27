@@ -108,7 +108,7 @@ export async function follow (user_id: string, unfollow: boolean = false) {
     }))
   } else {
     const limiter = new Limiter(100, 4 * 60 * 60 * 1000, 'twitter:unfollow')
-    promise = limiter.execute(() => client.post('friendships/destroy', {
+    promise = limiter.execute(() => client.post('friendships/destroy.json', {
       user_id
     }))
   }
