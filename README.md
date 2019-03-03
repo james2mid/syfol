@@ -20,6 +20,8 @@ Syfol can be used as a NPM package but is designed primarily to be used as a scr
 4. Add your env file (see config below)
 5. Execute the `dist/script.js` file (forever or PM2 is recommended)
 
+Logging is done by the (debug)[https://www.npmjs.com/package/debug] module. To see the logging, change the `DEBUG` parameter when executing the script. The best options are `DEBUG=*` and slightly less verbose `DEBUG='syfol:main'`.
+
 ## Config
 Configuration is done via an env file. The default configuration path is `~/.syfol` but this can be changed by setting the `ENV_PATH` global. Ensure the path is absolute.
 
