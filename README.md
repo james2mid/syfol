@@ -15,8 +15,10 @@ Syfol is a script that allows any Twitter user to gain followers by temporarily 
 Syfol can be used as a NPM package but is designed primarily to be used as a script. See NPM usage below.
 
 1. Clone the repo
-2. Add your env file (see config below)
-3. Run it (forever or PM2 is recommended)
+2. Run `npm install` inside the directory
+3. Run `npm build` inside the directory
+4. Add your env file (see config below)
+5. Execute the `dist/script.js` file (forever or PM2 is recommended)
 
 ## Config
 Configuration is done via an env file. The default configuration path is `~/.syfol` but this can be changed by setting the `ENV_PATH` global. Ensure the path is absolute.
