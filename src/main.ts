@@ -67,6 +67,13 @@ async function processUnfollowing () {
     try {
       await follow(id, true)
     } catch (err) {
+      // user no longer exists
+      if (err.some((x: any) => x.code == 34)) {
+        debug('User deleted, skipping')
+        patchUnfollow(id)
+        continue
+      }
+
       debug(`Error occured while unfollowing user, breaking`)
       debug(err)
       break
@@ -109,7 +116,6 @@ async function processFollowing () {
     try {
       await follow(id)
     } catch (err) {
-      console.log('caught')
       debug(`Error occured while following user, breaking`)
       debug(err)
       break
