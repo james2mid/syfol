@@ -53,6 +53,7 @@ export function getExpiredIds () {
   return users
     .filter({ following: true })
     .filter(x => new Date(x.followTime).getTime() < expiryTime)
+    .sort((a, b) => a.followTime > b.followTime ? 1 : -1) // sort by oldest follow
     .map(x => x.id)
     .value()
 }
