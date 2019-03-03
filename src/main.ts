@@ -2,7 +2,7 @@ import Debug from 'debug'
 const debug = Debug('syfol:main')
 import { getEnv } from './env'
 import { users, getActiveFollowCount, patchUnfollow, getExpiredIds, insertFollow } from './db'
-import { follow, getUserIdsFromSearch } from './twitter'
+import { follow, getUserIdsFromSearch, unfollow } from './twitter'
 
 let timerId: NodeJS.Timeout | null
 
@@ -65,7 +65,7 @@ async function processUnfollowing () {
   for (let id of unfollowList) {
     // attempt unfollow at Twitter API
     try {
-      await follow(id, true)
+      await unfollow(id)
     } catch (err) {
       // user no longer exists
       if (err.some((x: any) => x.code == 34)) {

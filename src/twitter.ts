@@ -94,24 +94,25 @@ export async function getUserIdsFromSearch (query: string, quantity: number): Pr
   return userIds
 }
 
-/** Follows or unfollows the provided user. Rejects on an error or when rate limit has been reached. */
-export async function follow (user_id: string, unfollow: boolean = false) {
-  debug(`${unfollow ? 'Unfollowing' : 'Following'} user ${user_id}`)
+/** Follows the user with the given id. Rejects on an error and when rate limit has been reached. */
+export async function follow (user_id: string) {
+  debug(`Following user ${user_id}`)
 
-  let promise
+  const limiter = new Limiter(200, 4 * 60 * 60 * 1000, 'twitter:follow')
 
-  if (!unfollow) {
-    const limiter = new Limiter(200, 4 * 60 * 60 * 1000, 'twitter:follow')
-    promise = limiter.execute(() => client.post('friendships/create.json', {
-      user_id,
-      follow: false // this option is for notifications
-    }))
-  } else {
-    const limiter = new Limiter(100, 4 * 60 * 60 * 1000, 'twitter:unfollow')
-    promise = limiter.execute(() => client.post('friendships/destroy.json', {
-      user_id
-    }))
-  }
+  await limiter.execute(() => client.post('friendships/create.json', {
+    user_id,
+    follow: false // this option is for notifications
+  }))
+}
 
-  await promise
+/** Follows the user with the given id. Rejects on an error and when rate limit has been reached. */
+export async function unfollow (user_id: string) {
+  debug(`Unfollowing user ${user_id}`)
+
+  const limiter = new Limiter(100, 4 * 60 * 60 * 1000, 'twitter:unfollow')
+
+  await limiter.execute(() => client.post('friendships/destroy.json', {
+    user_id
+  }))
 }
