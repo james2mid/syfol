@@ -5,11 +5,15 @@
 Syfol is a script that allows any Twitter user to gain followers by temporarily following others.
 
 ## Features
-* Follows users posting tweets matching specified search criteria
-* Skips any users that have been followed before
-* Permits configurable limits, see under config
-* Never crashes, all exceptions caught
-* Adheres to Twitter's rate limiting
+- [x] Follows users posting tweets matching specified search criteria
+- [x] Adheres to Twitter's rate limiting
+- [x] Skips any users that have been followed before
+- [x] Configurable limits, see config
+- [x] Never crashes, all exceptions caught
+- [ ] Distribute (un)follows over time for a better relationship with Twitter's rate limiting AI
+- [ ] Automatically retrieve new access tokens on expiry
+- [ ] Slack integration (status updates, work done, change params)
+- [ ] Fully-managed cloud service for the less technical
 
 ## Usage
 Syfol can be used as a NPM package but is designed primarily to be used as a script. See NPM usage below.
@@ -25,7 +29,7 @@ Logging is done by the [debug](https://www.npmjs.com/package/debug) module. To s
 ## Config
 Configuration is done via an env file. The default configuration path is `~/.syfol` but this can be changed by setting the `ENV_PATH` global. Ensure the path is absolute.
 
-This is an example file minus keys which you need to get from Twitter.
+This is an example file minus API keys which you need to get from Twitter.
 
 ```
 SEARCH_QUERY='candy'           # The query for the search
@@ -43,7 +47,7 @@ TWITTER_ACCESS_TOKEN_SECRET=''
 
 
 ## NPM Usage
-You can also use this module as an NPM module.
+You can also use this module as an NPM module although there is very little functionality.
 
 Install from npm
 
