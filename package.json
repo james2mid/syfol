@@ -43,7 +43,7 @@
     "@types/lowdb": "^1.0.6",
     "@types/twitter": "^1.7.0",
     "debug": "^4.1.1",
-    "dotenv": "^6.2.0",
+    "dotenv": "^8.2.0",
     "jimlim": "^1.2.0",
     "joi": "^14.3.1",
     "lowdb": "^1.0.0",
