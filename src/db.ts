@@ -1,6 +1,7 @@
 import low from 'lowdb'
 import FileSync from 'lowdb/adapters/FileSync'
 import { getEnv } from './env';
+import { ObjectChain, Collection, CollectionChain } from 'lodash';
 
 const adapter = new FileSync('db.json')
 
@@ -22,17 +23,24 @@ interface User {
 }
 
 /** The typed lowdb collection for users. */
-export const users: low.LoDashExplicitSyncWrapper<User[]> = db.get('users')
+export const users = db.get('users') as CollectionChain<User>
 
 /** Gets the number of active follows created by syfol. */
 export function getActiveFollowCount () {
-  return users.filter({ following: true }).value().length
+  return users
+    .filter(x => !!x.following)
+    .value()
+    .length
 }
 
 /** Inserts a new record for the given id saying they've been followed. */
 export function insertFollow (id: string) {
   users
-    .push({ id, following: true, followTime: new Date() })
+    .push({
+      id,
+      following: true,
+      followTime: new Date()
+    })
     .write()
 }
 
@@ -51,7 +59,7 @@ export function getExpiredIds () {
   const expiryTime = Date.now() - Number(FOLLOW_PERIOD)
 
   return users
-    .filter({ following: true })
+    .filter(x => !!x.following)
     .filter(x => new Date(x.followTime).getTime() < expiryTime)
     .sort((a, b) => a.followTime > b.followTime ? 1 : -1) // sort by oldest follow
     .map(x => x.id)
